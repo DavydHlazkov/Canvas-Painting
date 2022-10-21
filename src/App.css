@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.button-container {
+  position: absolute;
+  top: 500px;
+  left: 0px;
+}
+
+button {
+  width: 500px;
+  height: 40px;
+  border: 1px solid #52b9b3;
+  background: white;
+  color: #d22b2b;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
