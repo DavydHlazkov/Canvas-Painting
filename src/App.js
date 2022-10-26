@@ -180,6 +180,7 @@ function App() {
   };
 
   var x = 10;
+  var y = 20;
 
   return (
     <div className="container">
