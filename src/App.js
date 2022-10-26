@@ -179,6 +179,8 @@ function App() {
     collapseLines(startCollapse);
   };
 
+  var x = 10;
+
   return (
     <div className="container">
       <canvas
