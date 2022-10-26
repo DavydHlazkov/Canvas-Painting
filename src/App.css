@@ -1,20 +1,31 @@
+body {
+  background-color: #ccf7f4;
+}
+
 .container {
   display: flex;
-  justify-content: flex-start;
 }
 
 .button-container {
+  display: flex;
+  width: 100%;
   position: absolute;
-  top: 500px;
+  top: 600px;
   left: 0px;
+  align-items: center;
 }
 
 button {
-  width: 500px;
   height: 40px;
   border: 1px solid #52b9b3;
   background: white;
   color: #d22b2b;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+}
+
+p {
+  color: red;
+  margin-left: auto;
+  margin-right: auto;
 }

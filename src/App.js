@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from "react";
 import "./App.css";
 import rough from "roughjs/bundled/rough.esm";
+
 const generator = rough.generator();
 function createElement(x1, y1, x2, y2) {
   const roughElement = generator.line(x1, y1, x2, y2, {
@@ -18,11 +19,12 @@ function App() {
   const [isInter, setIsInter] = useState(false);
   const [beforeContex, setBeforeContext] = useState([]);
   const [startCollapse, setStartCollapse] = useState(false);
+  const [myWindow, setWindow] = useState(window.innerWidth);
 
   useLayoutEffect(() => {
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
-    context.clearRect(0, 0, 500, 500);
+    context.clearRect(0, 0, myWindow, 600);
     const roughCanvas = rough.canvas(canvas);
     elements.forEach((el) =>
       roughCanvas.line(el.x1, el.y1, el.x2, el.y2, { stroke: "#FFF" })
@@ -31,7 +33,14 @@ function App() {
       roughCanvas.circle(cir.x, cir.y, 10, { stroke: "#D22B2B" })
     );
     setIsInter(false);
-  }, [elements, isInter, coordinate]);
+    setWindow(window.innerWidth);
+    const interval = setInterval(() => {
+      if (startCollapse === true) {
+        onClickCollapse();
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, [elements, isInter, coordinate, startCollapse, window.innerWidth]);
 
   const updateCoordinate = (event) => {
     const { clientX, clientY } = event;
@@ -132,6 +141,10 @@ function App() {
       setElemets(elements.slice(0, -1));
     }
     setIsDeleted(true);
+    console.log(
+      "🚀 ~ file: App.js ~ line 142 ~ handleContextMenu ~  window.innerWidth",
+      window.innerWidth
+    );
   };
 
   const getMiddle = (line) => {
@@ -150,37 +163,40 @@ function App() {
     return length;
   };
 
+  const getHalfLine = (line) => {
+    let middleX = getMiddle(line).x;
+    let middleY = getMiddle(line).y;
+    let halfX = getLength(line.x1, line.y1, middleX, middleY).xLength / 15;
+    let halfY = getLength(line.x1, line.y1, middleX, middleY).yLength / 15;
+
+    let newLineX1 = line.x1 < line.x2 ? line.x1 + halfX : line.x1 - halfX;
+    let newLineY1 = line.y1 < line.y2 ? line.y1 + halfY : line.y1 - halfY;
+    let newLineX2 = line.x2 < line.x1 ? line.x2 + halfX : line.x2 - halfX;
+    let newLineY2 = line.y2 < line.y1 ? line.y2 + halfY : line.y2 - halfY;
+
+    setElemets((prevState) => [
+      ...prevState,
+      { x1: newLineX1, y1: newLineY1, x2: newLineX2, y2: newLineY2 },
+    ]);
+    console.log(elements);
+  };
+
   const collapseLines = (value) => {
     if (value === true) {
       setElemets([]);
-      const getHalfLine = (line) => {
-        let middleX = getMiddle(line).x;
-        let middleY = getMiddle(line).y;
-        let halfX = getLength(line.x1, line.y1, middleX, middleY).xLength / 10;
-        let halfY = getLength(line.x1, line.y1, middleX, middleY).yLength / 10;
-
-        let newLineX1 = line.x1 < line.x2 ? line.x1 + halfX : line.x1 - halfX;
-        let newLineY1 = line.y1 < line.y2 ? line.y1 + halfY : line.y1 - halfY;
-        let newLineX2 = line.x2 < line.x1 ? line.x2 + halfX : line.x2 - halfX;
-        let newLineY2 = line.y2 < line.y1 ? line.y2 + halfY : line.y2 - halfY;
-        setElemets((prevState) => [
-          ...prevState,
-          { x1: newLineX1, y1: newLineY1, x2: newLineX2, y2: newLineY2 },
-        ]);
-      };
-
       elements.forEach((el) => getHalfLine(el));
+      console.log(elements);
       setCoordinate([]);
+      return;
     }
+    return;
   };
 
   const onClickCollapse = () => {
+    console.log(elements);
     setStartCollapse(true);
     collapseLines(startCollapse);
   };
-
-  var x = 10;
-  var y = 20;
 
   return (
     <div className="container">
@@ -188,9 +204,10 @@ function App() {
         id="canvas"
         style={{
           backgroundColor: "#52B9B3",
+          display: "flex",
         }}
-        width={"500px"}
-        height={"500px"}
+        width={`${myWindow}px`}
+        height={"600px"}
         onClick={handleClick}
         onMouseMove={handleMouseMove}
         onContextMenu={handleContextMenu}
@@ -198,12 +215,13 @@ function App() {
         Canvas
       </canvas>
       <div className="button-container">
-        <button
-          onClick={() => onClickCollapse(true)}
-          onMouseMove={() => collapseLines(startCollapse)}
-        >
-          {!startCollapse ? "click & swipe for collapse" : `swipe for collapse`}
-        </button>
+        {!startCollapse ? (
+          <button style={{ width: `${myWindow}px` }} onClick={onClickCollapse}>
+            Collapse lines
+          </button>
+        ) : (
+          <p>Press on canvas for new work</p>
+        )}
       </div>
     </div>
   );
